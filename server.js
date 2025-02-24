@@ -23,21 +23,46 @@ app.use(express.json());
 
 // Live database
 
-const db = mysql.createConnection({
-  host: env.parsed.DB_HOST,
-  user:env.parsed.DB_USER,
-  password:env.parsed.DB_PASSWORD,
-  database: env.parsed.DB_NAME,
-  waitForConnections:true,
-  connectionLimit:10,
-});
+let db;
+function handleDisconnect() {
+  db = mysql.createConnection({
+    host: env.parsed.DB_HOST,
+    user: env.parsed.DB_USER,
+    password: env.parsed.DB_PASSWORD,
+    database: env.parsed.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
 
+  db.connect((err) => {
+    if (err) {
+      console.error('Error when connecting to MySQL:', err);
+      setTimeout(handleDisconnect, 2000); // Reconnect after 2 seconds
+    }
+  });
 
+  db.on('error', (err) => {
+    console.error('MySQL error', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      handleDisconnect(); // Reconnect if connection is lost
+    } else {
+      throw err;
+    }
+  });
+}
+
+handleDisconnect();
 
 db.connect((err) => {
-  if (err) throw err;
-  console.log("MySQL Connected...");
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the database');
 });
+
+
 
 app.post("/signup", (req, res) => {
   const { username, email, password } = req.body;
