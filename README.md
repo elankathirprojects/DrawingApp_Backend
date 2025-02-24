@@ -7,11 +7,11 @@
 
    ## Clone the Frontend Separately
 
-    step :1    git clone https://github.com/your-repo/drawing-app-client.git.
+    step :1    git clone https://github.com/elankathirprojects/DrawingApp_frontend.git
 
    ## Clone the Backend Separately
 
-    step :1   git clone https://github.com/your-repo/drawing-app.git.
+    step :1   git clone https://github.com/elankathirprojects/DrawingApp_Backend.git
 
 
  #### Steps to run the server and client.
